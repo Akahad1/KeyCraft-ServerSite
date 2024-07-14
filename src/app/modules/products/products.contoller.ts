@@ -38,8 +38,35 @@ const getSingleAllProducts = catchAsync(async (req, res) => {
   });
 });
 
+const updateSingleAllProducts = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  // const { product } = ;
+  const result = await productsServies.updateProductIntoDB(id, req.body);
+
+  sendResponse(res, {
+    satatusCode: httpStatus.OK,
+    success: true,
+    mesages: "product is updated succesfully",
+    data: result,
+  });
+});
+const deleteProduct = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  // const { product } = ;
+  const result = await productsServies.deleteProductFromDB(id);
+
+  sendResponse(res, {
+    satatusCode: httpStatus.OK,
+    success: true,
+    mesages: "Delete  succesfully",
+    data: result,
+  });
+});
+
 export const productsController = {
   createProducts,
   getAllProducts,
   getSingleAllProducts,
+  updateSingleAllProducts,
+  deleteProduct,
 };

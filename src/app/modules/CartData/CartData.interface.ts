@@ -1,4 +1,7 @@
-export type TProduct = {
+import { Types } from "mongoose";
+
+export type TCartData = {
+  cartid: Types.ObjectId;
   image: string;
   title: string;
   description: string;
