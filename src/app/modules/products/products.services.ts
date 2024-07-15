@@ -1,3 +1,4 @@
+import { number } from "zod";
 import QureyBuilder from "../../builder/qureyBuilder";
 import { ProductsSearchableFields } from "./products.coninst";
 import { TProduct } from "./products.interface";
@@ -9,12 +10,48 @@ const createProductIntoDB = async (payload: TProduct) => {
 };
 
 const getProductFromDB = async (query: Record<string, unknown>) => {
-  const couresQurey = new QureyBuilder(Products.find(), query)
-    .search(ProductsSearchableFields)
-    .filter()
-    .sort();
-  const result = await couresQurey.modelQurey;
-  return result;
+  const qureyObj = { ...query };
+  const searchItem = ["title", "brand"];
+  let searchTerm = "";
+  if (query?.searchTerm) {
+    searchTerm = query?.searchTerm as string;
+  }
+
+  // {name:{$regex :qurey.searchTerm ,$options :"i"}}\
+  // let sorts = 1;
+  // if (query.sort === "des") {
+  //   sorts = -1;
+  // } else {
+  //   sorts = 1;
+  // }
+
+  const searchQurey = Products.find({
+    $or: searchItem.map((field) => ({
+      [field]: { $regex: searchTerm, $options: "i" },
+    })),
+  });
+  // filter
+  const queryField = ["searchTerm", "sort"];
+  queryField.forEach((el) => delete qureyObj[el]);
+  const FilterQuery = searchQurey.find(qureyObj);
+  // sort
+  let sort = 1;
+  if (query?.sort) {
+    sort = query.sort as number;
+  }
+  let sortOrder = 1; // Default to ascending order (low to high)
+
+  if (query?.sort === "Sort by price: hight to low") {
+    sortOrder = -1; // Set to descending order (high to low)
+  } else if (query?.sort === "Sort by price: low to hight") {
+    sortOrder = 1;
+  }
+
+  const sortQurey = await FilterQuery.sort({ price: sortOrder } as any);
+
+  // Search by name or brand
+
+  return sortQurey;
 };
 const getSingleProductFromDB = async (id: any) => {
   const result = await Products.findById(id);
