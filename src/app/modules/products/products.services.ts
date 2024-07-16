@@ -1,6 +1,3 @@
-import { number } from "zod";
-import QureyBuilder from "../../builder/qureyBuilder";
-import { ProductsSearchableFields } from "./products.coninst";
 import { TProduct } from "./products.interface";
 import { Products } from "./products.model";
 
@@ -16,14 +13,6 @@ const getProductFromDB = async (query: Record<string, unknown>) => {
   if (query?.searchTerm) {
     searchTerm = query?.searchTerm as string;
   }
-
-  // {name:{$regex :qurey.searchTerm ,$options :"i"}}\
-  // let sorts = 1;
-  // if (query.sort === "des") {
-  //   sorts = -1;
-  // } else {
-  //   sorts = 1;
-  // }
 
   const searchQurey = Products.find({
     $or: searchItem.map((field) => ({
